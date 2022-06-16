@@ -1,0 +1,42 @@
+library(tidyverse)
+source("src/lda_topic_modeling_api.R")
+
+document_directory = "data/docs/"
+my_desired_number_of_topics = 41
+my_desired_number_of_top_words_per_topic = 10
+
+file_list = list.files(document_directory) 
+# try and create a doc term matrix from a list of pdf, html, txt, powerpoint and word docs
+all_docs_in_a_directory = paste0(document_directory, file_list)
+my_docs_df = from.a.list.of.files.to.file.text.df(all_docs_in_a_directory)
+my_docs_as_tidy_txt = from.file.text.df.to.tidytext(my_docs_df)
+
+# this gets our very own doc term matrix
+my_dtm = from.tidy.text.to.dtm(my_docs_as_tidy_txt)
+
+# now we can topic model with it
+my_lda = get.lda(my_dtm, my_desired_number_of_topics)
+my_topics = get.tidy.topics.from.lda(my_lda)
+my_top_terms = get.top.terms.from.topics(my_topics, my_desired_number_of_top_words_per_topic)
+
+# my_topics_per_doc
+my_topics_per_doc = get.tidy.topics.from.lda(my_lda, per.document = TRUE)
+
+my_tidy_docs_classified_into_topics = get.tidy.document.classification.from.lda(my_topics_per_doc)
+my_tidy_docs_classified_into_topics
+
+# check out this link https://www.r-bloggers.com/2017/01/cross-validation-of-topic-modelling/
+# and see if you can get that code running (it will take an overnight run to complete the example code in the link)
+
+#extracting topic list from my_topics
+topic_list <- unique(my_topics[[2]])
+
+#Write to csv
+topic_df <- as.data.frame(topic_list)
+write_csv(topic_df, file = "topics.csv")
+
+topics_df <- as.data.frame(my_topics)
+
+#Get rid of numbers
+topics_no_num <- topics_df %>% filter(term %>% str_detect("^[:alpha:]+$")) 
+write_csv(topics_no_num, file = "topics_and_topic_number.csv")
