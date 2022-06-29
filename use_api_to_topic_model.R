@@ -40,3 +40,23 @@ topics_df <- as.data.frame(my_topics)
 #Get rid of numbers
 topics_no_num <- topics_df %>% filter(term %>% str_detect("^[:alpha:]+$")) 
 write_csv(topics_no_num, file = "topics_and_topic_number.csv")
+
+# topics organized into categories
+categorized_topics <- read.csv('topics_and_category.csv')
+my_topics_with_categories = inner_join(my_topics_per_doc, categorized_topics)%>% 
+  group_by(document, category) %>% summarise(cat_gamma = sum(gamma)) %>% 
+  mutate(rank = rank(-cat_gamma, ties.method = "min")) %>%
+  arrange(document, rank, cat_gamma) %>% ungroup()
+
+my_tidy_docs_classified_into_topics = get.tidy.document.classification.from.lda(my_topics_per_doc)
+my_tidy_docs_classified_into_topics
+
+# Prep and organize data for spearman correlation
+
+## import human topic modeling
+human <- read.csv("categorized.csv")  # csv containing human rankings
+
+## Combine two data frames
+correlations_df = inner_join(my_topics_with_categories, human)
+
+vector_of_corr_results = c()  #empty vector to append to
