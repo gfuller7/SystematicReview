@@ -66,7 +66,7 @@ clusterEvalQ(cluster, {
 })
 folds <- 5
 splitfolds <- sample(1:folds, n, replace = TRUE)
-candidate_k <- seq(20,50, 1) # sweep for topics based on inital validation
+candidate_k <- seq(20,50, 1) # sweep for topics based on initial validation
 clusterExport(cluster, c("full_data", "burnin", "iter", "keep", "splitfolds", "folds", "candidate_k"))
 # we parallelize by the different number of topics.  A processor is allocated a value
 # of k, and does the cross-validation serially.  This is because it is assumed there
