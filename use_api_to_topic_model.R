@@ -60,3 +60,14 @@ human <- read.csv("categorized.csv")  # csv containing human rankings
 correlations_df = inner_join(my_topics_with_categories, human)
 
 vector_of_corr_results = c()  #empty vector to append to
+# loop to find correlation vals for each doc.
+for (x in all_docs_in_a_directory){
+  current_document_result = compute_correlation_btwn_topic_ranks(x, correlations_df)
+  vector_of_corr_results <- c(vector_of_corr_results, current_document_result)
+}
+
+corr_results_df <- as.data.frame(vector_of_corr_results)
+
+# summary statistics on vector_of_corr_results min, max, mean, median, std_dev
+summary(corr_results_df)
+sd(vector_of_corr_results)
